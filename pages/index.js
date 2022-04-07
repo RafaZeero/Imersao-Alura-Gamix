@@ -1,4 +1,6 @@
 import { Box, Button, Text, TextField, Image } from '@skynexui/components'
+import { useState } from 'react'
+import { useRouter } from 'next/router'
 import styled from 'styled-components'
 
 import appConfig from '../config.json'
@@ -7,36 +9,6 @@ import appConfig from '../config.json'
 //   color: ${({ theme }) => theme.colors.primary};
 //   justify-content: center;
 // `
-function GlobalStyle() {
-  return (
-    <style global jsx>{`
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-      body {
-        font-family: 'Open Sans', sans-serif;
-      }
-      /* App fit Height */
-      html,
-      body,
-      #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */
-    `}</style>
-  )
-}
 
 function Titulo(props) {
   const Tag = props.tag || 'h1'
@@ -65,25 +37,41 @@ function Titulo(props) {
 // }
 
 export default function PaginaInicial() {
-  const username = 'rafazeero'
+  // const username = 'rafazeero'
+  const [username, setUsername] = useState('rafazeero')
+  const [bgChange, setBgChange] = useState(false)
+  const router = useRouter()
 
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           backgroundColor: appConfig.theme.colors.primary[50],
-          backgroundImage: 'url(./img/main-bg.jpg)',
+          backgroundImage: bgChange
+            ? 'url(./img/main-bg.jpg)'
+            : 'url(./img/main-bg-2.jpg)',
           // backgroundImage:
           //   'url(https://virtualbackgrounds.site/wp-content/uploads/2020/08/the-matrix-digital-rain.jpg)',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
-          backgroundBlendMode: 'multiply'
+          backgroundBlendMode: 'multiply',
+          transition: 'backgroundImage ease .4s'
         }}
       >
+        <Button
+          styleSheet={{
+            position: 'absolute',
+            left: '0',
+            top: '0'
+            // width: '52px',
+            // height: '52px'
+          }}
+          onClick={() => setBgChange(prevState => !prevState)}
+          label="Mude a imagem de fundo"
+        />
         <Box
           styleSheet={{
             display: 'flex',
@@ -106,6 +94,10 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
+            onSubmit={e => {
+              e.preventDefault()
+              router.push('/chat')
+            }}
             styleSheet={{
               display: 'flex',
               flexDirection: 'column',
@@ -128,10 +120,14 @@ export default function PaginaInicial() {
             </Text>
 
             <TextField
+              value={username}
+              onChange={e => {
+                setUsername(e.target.value)
+              }}
               fullWidth
               textFieldColors={{
                 neutral: {
-                  textColor: appConfig.theme.colors.neutrals[200],
+                  textColor: appConfig.theme.colors.primary[400],
                   mainColor: appConfig.theme.colors.neutrals[900],
                   mainColorHighlight: appConfig.theme.colors.primary[500],
                   backgroundColor: appConfig.theme.colors.neutrals[800]
