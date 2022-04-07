@@ -58,7 +58,7 @@ export default function PaginaInicial() {
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
           backgroundBlendMode: 'multiply',
-          transition: 'backgroundImage ease .4s'
+          transition: 'ease-in .4s'
         }}
       >
         <Button
