@@ -8,7 +8,7 @@
 //   )
 // }
 
-import { Box, Text, TextField, Image, Button } from '@skynexui/components'
+import { Box, Text, TextField, Image, Button, Icon } from '@skynexui/components'
 import { useState } from 'react'
 import appConfig from '../config.json'
 // JavaScript
@@ -19,14 +19,6 @@ export default function ChatPage() {
   const [mensagem, setMensagem] = useState('')
   const [listaDeMensagens, setListaDeMensagens] = useState([])
 
-  const deleteMessage = id => {
-    setListaDeMensagens(prevMessage => {
-      return prevMessage.filter(message => {
-        return id !== message.id
-      })
-    })
-  }
-
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
       id: listaDeMensagens.length + 1,
@@ -36,6 +28,11 @@ export default function ChatPage() {
 
     setListaDeMensagens([mensagem, ...listaDeMensagens])
     setMensagem('')
+  }
+
+  function handleRemove(id) {
+    const novaLista = listaDeMensagens.filter(item => item.id !== id)
+    setListaDeMensagens(novaLista)
   }
 
   // ./Sua lógica vai aqui
@@ -63,8 +60,8 @@ export default function ChatPage() {
           borderRadius: '5px',
           backgroundColor: appConfig.theme.colors.neutrals[700],
           height: '100%',
-          maxWidth: '95%',
-          maxHeight: '95vh',
+          maxWidth: '80%',
+          maxHeight: '80vh',
           padding: '32px',
           opacity: '0.9'
         }}
@@ -82,7 +79,10 @@ export default function ChatPage() {
             padding: '16px'
           }}
         >
-          <MessageList mensagens={listaDeMensagens} onClick={deleteMessage} />
+          <MessageList
+            mensagens={listaDeMensagens}
+            deletaMensagem={handleRemove}
+          />
           {/* {listaDeMensagens.map((mensagemAtual) => {
                     return (
                         <li key={mensagemAtual.id}>
@@ -92,6 +92,10 @@ export default function ChatPage() {
                 })} */}
           <Box
             as="form"
+            onSubmit={e => {
+              e.preventDefault()
+              handleNovaMensagem(mensagem)
+            }}
             styleSheet={{
               display: 'flex',
               alignItems: 'center'
@@ -120,6 +124,26 @@ export default function ChatPage() {
                 backgroundColor: appConfig.theme.colors.neutrals[800],
                 marginRight: '12px',
                 color: appConfig.theme.colors.neutrals[200]
+              }}
+            />
+            <Button
+              type="submit"
+              label="Enviar"
+              fullwidth="true"
+              styleSheet={{
+                height: '85%',
+                // width: '15%',
+                borderRadius: '15% 10%',
+                border: 0,
+                padding: '6px 8px',
+                marginBottom: '9px',
+                fontSize: '18px'
+              }}
+              buttonColors={{
+                contrastColor: appConfig.theme.colors.neutrals['100'],
+                mainColor: appConfig.theme.colors.primary[500],
+                mainColorLight: appConfig.theme.colors.primary[400],
+                mainColorStrong: appConfig.theme.colors.primary[600]
               }}
             />
           </Box>
@@ -195,6 +219,11 @@ function MessageList(props) {
                   marginRight: '8px'
                 }}
                 src={`https://github.com/vanessametonini.png`}
+              />
+              <Icon
+                label="Icon Component"
+                name="FaTrash"
+                onClick={() => props.deletaMensagem(mensagem.id)}
               />
               <Text tag="strong">{mensagem.de}</Text>
               <Text
