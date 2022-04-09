@@ -11,7 +11,20 @@
 import { Box, Text, TextField, Image, Button, Icon } from '@skynexui/components'
 import { useState } from 'react'
 import appConfig from '../config.json'
+import { createClient } from '@supabase/supabase-js'
 // JavaScript
+
+const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eG9laG1qbmdia2Jrd3Byb3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDk0Njk3MjUsImV4cCI6MTk2NTA0NTcyNX0.60TQ-iDUJGYGRPbbsz2a2ofZ5VvY84w5Y5p4fD9h4IM'
+
+const SUPABASE_URL = 'https://luxoehmjngbkbkwprova.supabase.co'
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const dadosSupabase = supabaseClient
+  .from('Gamix')
+  .select('*')
+  .then(() => {})
 
 export default function ChatPage() {
   // Sua lógica vai aqui

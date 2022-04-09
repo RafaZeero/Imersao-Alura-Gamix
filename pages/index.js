@@ -108,7 +108,7 @@ export default function PaginaInicial() {
               marginBottom: '32px'
             }}
           >
-            <Titulo tag="h2">Boas vindas ao Gamix!</Titulo>
+            <Titulo tag="h2">Bem vindo(a) ao Gamix!</Titulo>
             <Text
               variant="body3"
               styleSheet={{
