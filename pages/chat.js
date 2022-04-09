@@ -1,45 +1,47 @@
-// export default function PaginaDoChat() {
-//   return (
-//     <div>
-//       <h2>Página do chat</h2>
-//       <p>Bem vindo ao chat do Gamix!</p>
-//       <span>Jogue seus jogos de tabuleiro, com seus amigos, à distância</span>
-//     </div>
-//   )
-// }
-
 import { Box, Text, TextField, Image, Button, Icon } from '@skynexui/components'
-import { useState } from 'react'
+import React from 'react'
 import appConfig from '../config.json'
 import { createClient } from '@supabase/supabase-js'
-// JavaScript
 
+// Como fazer AJAX: https://medium.com/@omariosouto/entendendo-como-fazer-ajax-com-a-fetchapi-977ff20da3c6
 const SUPABASE_ANON_KEY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eG9laG1qbmdia2Jrd3Byb3ZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDk0Njk3MjUsImV4cCI6MTk2NTA0NTcyNX0.60TQ-iDUJGYGRPbbsz2a2ofZ5VvY84w5Y5p4fD9h4IM'
-
 const SUPABASE_URL = 'https://luxoehmjngbkbkwprova.supabase.co'
-
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-const dadosSupabase = supabaseClient
-  .from('Gamix')
-  .select('*')
-  .then(() => {})
-
 export default function ChatPage() {
-  // Sua lógica vai aqui
+  const [mensagem, setMensagem] = React.useState('')
+  const [listaDeMensagens, setListaDeMensagens] = React.useState([])
 
-  const [mensagem, setMensagem] = useState('')
-  const [listaDeMensagens, setListaDeMensagens] = useState([])
+  React.useEffect(() => {
+    supabaseClient
+      .from('mensagens')
+      .select('*')
+      .order('id', { ascending: false })
+      .then(({ data }) => {
+        console.log('Dados da consulta:', data)
+        setListaDeMensagens(data)
+      })
+  }, [])
 
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
-      id: listaDeMensagens.length + 1,
+      // id: listaDeMensagens.length + 1,
       de: 'vanessametonini',
       texto: novaMensagem
     }
 
-    setListaDeMensagens([mensagem, ...listaDeMensagens])
+    supabaseClient
+      .from('mensagens')
+      .insert([
+        // Tem que ser um objeto com os MESMOS CAMPOS que você escreveu no supabase
+        mensagem
+      ])
+      .then(({ data }) => {
+        console.log('Criando mensagem: ', data)
+        setListaDeMensagens([data[0], ...listaDeMensagens])
+      })
+
     setMensagem('')
   }
 
@@ -48,7 +50,6 @@ export default function ChatPage() {
     setListaDeMensagens(novaLista)
   }
 
-  // ./Sua lógica vai aqui
   return (
     <Box
       styleSheet={{
@@ -56,7 +57,6 @@ export default function ChatPage() {
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: appConfig.theme.colors.primary[500],
-        // backgroundImage: `url(https://virtualbackgrounds.site/wp-content/uploads/2020/08/the-matrix-digital-rain.jpg)`,
         backgroundImage: `url(https://i0.wp.com/nerdarchy.com/wp-content/uploads/2018/03/RPG-group-2.jpg?fit=1200%2C720&ssl=1)`,
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
@@ -94,15 +94,15 @@ export default function ChatPage() {
         >
           <MessageList
             mensagens={listaDeMensagens}
-            deletaMensagem={handleRemove}
+            handleRemove={handleRemove}
           />
           {/* {listaDeMensagens.map((mensagemAtual) => {
-                    return (
-                        <li key={mensagemAtual.id}>
-                            {mensagemAtual.de}: {mensagemAtual.texto}
-                        </li>
-                    )
-                })} */}
+                        return (
+                            <li key={mensagemAtual.id}>
+                                {mensagemAtual.de}: {mensagemAtual.texto}
+                            </li>
+                        )
+                    })} */}
           <Box
             as="form"
             onSubmit={e => {
@@ -231,14 +231,14 @@ function MessageList(props) {
                   display: 'inline-block',
                   marginRight: '8px'
                 }}
-                src={`https://github.com/vanessametonini.png`}
+                src={`https://github.com/${mensagem.de}.png`}
               />
+              <Text tag="strong">{mensagem.de}</Text>
               <Icon
                 label="Icon Component"
                 name="FaTrash"
-                onClick={() => props.deletaMensagem(mensagem.id)}
+                onClick={() => props.handleRemove(mensagem.id)}
               />
-              <Text tag="strong">{mensagem.de}</Text>
               <Text
                 styleSheet={{
                   fontSize: '10px',
